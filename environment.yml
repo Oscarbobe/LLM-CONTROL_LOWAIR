@@ -1,0 +1,22 @@
+name: swing-control
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - pip
+  - numpy
+  - pandas
+  - scipy
+  - pyyaml
+  - networkx
+  - pip:
+      - bluepy
+      - untangle
+      - zeroconf
+      - opencv-python
+      - SpeechRecognition
+      - jieba
+      - pydantic
+      - rich
+

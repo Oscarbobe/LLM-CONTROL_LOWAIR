@@ -1,0 +1,32 @@
+project:
+  name: swing_control
+  description: 基于自然语言的山区无人机智能控制原型
+
+python:
+  default_bin: /home/abc/miniconda3/bin/python
+
+drone:
+  type: parrot_swing
+  default_addr: E0:14:89:09:3D:CB
+  connection_retries: 3
+
+flight_limits:
+  require_manual_takeoff_confirm: true
+  max_height_m: 20
+  min_height_m: 1
+  max_speed_mps: 3
+  default_hover_seconds: 2
+
+safety:
+  enable_geofence: true
+  enable_obstacle_check: true
+  low_battery_return_home: true
+  lost_connection_action: hover_then_land
+
+paths:
+  raw_audio: data/raw/audio
+  raw_text: data/raw/text
+  processed_instructions: data/processed/instructions
+  maps: data/maps
+  logs: data/logs
+

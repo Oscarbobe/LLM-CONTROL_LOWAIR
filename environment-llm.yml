@@ -1,0 +1,28 @@
+name: swing-control-llm
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas
+  - scipy
+  - pyyaml
+  - networkx
+  - pytorch
+  - pytorch-cuda=12.4
+  - pip:
+      - transformers
+      - accelerate
+      - sentencepiece
+      - protobuf
+      - jieba
+      - pydantic
+      - rich
+      - SpeechRecognition
+      - openai-whisper
+      - ollama
+

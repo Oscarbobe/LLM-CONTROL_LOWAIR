@@ -1,0 +1,18 @@
+# Minimal runtime dependencies for the current Swing automation scripts.
+# pyparrot is required, but it is often installed from source with `pip install -e .`.
+bluepy
+untangle
+zeroconf
+opencv-python
+numpy
+PyYAML
+
+# Optional dependencies for the natural-language prototype.
+SpeechRecognition
+jieba
+pydantic
+networkx
+pandas
+scipy
+rich
+
