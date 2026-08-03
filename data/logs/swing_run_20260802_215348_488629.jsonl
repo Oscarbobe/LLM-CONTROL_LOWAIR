@@ -1,0 +1,21 @@
+{"time": "2026-08-02T21:53:48", "run_type": "instruction_pipeline", "event": "instruction_received", "instruction": "起飞后悬停2秒再降落", "model": "qwen3.5:4b", "execute": true}
+{"time": "2026-08-02T21:53:53", "run_type": "instruction_pipeline", "event": "instruction_parsed", "result": {"ok": true, "actions": [{"tool": "pre_flight_check", "parameters": {}}, {"tool": "takeoff", "parameters": {"duration_s": 5}}, {"tool": "hover", "parameters": {"duration_s": 2.0}}, {"tool": "land", "parameters": {"duration_s": 5}}], "raw_output": "{\"error\":\"无法理解\"}\n\n规则兜底解析已启用。", "error": null}}
+{"time": "2026-08-02T21:53:53", "run_type": "instruction_pipeline", "event": "actions_saved", "path": "data/processed/instructions/last_actions.json", "actions": [{"tool": "pre_flight_check", "parameters": {}}, {"tool": "takeoff", "parameters": {"duration_s": 5}}, {"tool": "hover", "parameters": {"duration_s": 2.0}}, {"tool": "land", "parameters": {"duration_s": 5}}]}
+{"time": "2026-08-02T21:53:53", "run_type": "instruction_pipeline", "event": "validation_result", "result": {"ok": true, "errors": [], "warnings": ["动作序列包含起飞、运动或模式切换，真机执行前必须人工确认"], "require_manual_confirm": true}}
+{"time": "2026-08-02T21:53:53", "run_type": "instruction_pipeline", "event": "planned_steps", "steps": [{"index": 1, "tool": "pre_flight_check", "description": "执行起飞前安全检查", "pyparrot_preview": "# check bluetooth, battery, area, manual confirmation", "parameters": {}}, {"index": 2, "tool": "takeoff", "description": "安全起飞，等待 5 秒", "pyparrot_preview": "swing.safe_takeoff(5)", "parameters": {"duration_s": 5}}, {"index": 3, "tool": "hover", "description": "悬停 2 秒", "pyparrot_preview": "swing.smart_sleep(2)", "parameters": {"duration_s": 2.0}}, {"index": 4, "tool": "land", "description": "安全降落，等待 5 秒", "pyparrot_preview": "swing.safe_land(5)", "parameters": {"duration_s": 5}}]}
+{"time": "2026-08-02T21:54:14", "run_type": "instruction_pipeline", "event": "manual_confirmation", "result": {"confirmed": true, "message": "用户已确认执行"}}
+{"time": "2026-08-02T21:54:14", "run_type": "instruction_pipeline", "event": "execution_requested", "actions": [{"tool": "pre_flight_check", "parameters": {}}, {"tool": "takeoff", "parameters": {"duration_s": 5}}, {"tool": "hover", "parameters": {"duration_s": 2.0}}, {"tool": "land", "parameters": {"duration_s": 5}}], "validate": false}
+{"time": "2026-08-02T21:54:14", "run_type": "instruction_pipeline", "event": "connect_start", "addr": "e0:14:89:09:3d:cb", "retries": 3}
+{"time": "2026-08-02T21:54:17", "run_type": "instruction_pipeline", "event": "connect_result", "success": true}
+{"time": "2026-08-02T21:54:17", "run_type": "instruction_pipeline", "event": "action_start", "tool": "pre_flight_check", "parameters": {}}
+{"time": "2026-08-02T21:54:18", "run_type": "instruction_pipeline", "event": "action_done", "tool": "pre_flight_check"}
+{"time": "2026-08-02T21:54:18", "run_type": "instruction_pipeline", "event": "action_start", "tool": "takeoff", "parameters": {"duration_s": 5}}
+{"time": "2026-08-02T21:54:24", "run_type": "instruction_pipeline", "event": "action_done", "tool": "takeoff"}
+{"time": "2026-08-02T21:54:24", "run_type": "instruction_pipeline", "event": "action_start", "tool": "hover", "parameters": {"duration_s": 2.0}}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "action_done", "tool": "hover"}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "action_start", "tool": "land", "parameters": {"duration_s": 5}}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "action_done", "tool": "land"}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "execution_done", "executed_tools": ["pre_flight_check", "takeoff", "hover", "land"]}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "disconnect_start"}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "disconnect_done"}
+{"time": "2026-08-02T21:54:26", "run_type": "instruction_pipeline", "event": "run_finished", "exit_code": 0, "status": "execution_done", "result": {"ok": true, "executed_tools": ["pre_flight_check", "takeoff", "hover", "land"], "errors": [], "log_path": "data/logs/swing_run_20260802_215348_488629.jsonl"}}

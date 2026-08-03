@@ -1,0 +1,24 @@
+[
+  {
+    "tool": "pre_flight_check",
+    "parameters": {}
+  },
+  {
+    "tool": "takeoff",
+    "parameters": {
+      "duration_s": 5
+    }
+  },
+  {
+    "tool": "hover",
+    "parameters": {
+      "duration_s": 2.0
+    }
+  },
+  {
+    "tool": "land",
+    "parameters": {
+      "duration_s": 5
+    }
+  }
+]

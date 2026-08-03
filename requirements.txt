@@ -16,3 +16,18 @@ pandas
 scipy
 rich
 
+# LLM / NLP dependencies (swing-control-llm conda env).
+ollama
+transformers
+openai-whisper
+tiktoken
+numba
+sentencepiece
+
+# PyTorch (GPU) — install via:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+# or via conda:
+#   conda install -n swing-control-llm -c pytorch -c nvidia pytorch pytorch-cuda=12.4
+# torch
+# torchvision
+# torchaudio

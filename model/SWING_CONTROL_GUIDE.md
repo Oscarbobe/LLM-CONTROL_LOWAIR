@@ -89,6 +89,8 @@ SWING_ADDR=E0:14:89:09:3D:CB ./model/run_swing_direct_flight.sh
 ./model/run_swing_direct_flight.sh --addr E0:14:89:09:3D:CB
 ./model/run_swing_direct_flight.sh --skip-bluetooth-fix
 ./model/run_swing_direct_flight.sh --no-sudo
+./model/run_swing_direct_flight.sh --update-bluetooth-firmware
+./model/run_swing_direct_flight.sh --install-bluetooth-fix
 ```
 
 常用环境变量：
@@ -98,6 +100,7 @@ PYTHON_BIN=/home/abc/miniconda3/bin/python
 SWING_ADDR=E0:14:89:09:3D:CB
 RUN_WITH_SUDO=0
 FIX_SCRIPT=/path/to/fix_mt7925_bluetooth.sh
+BLUETOOTH_DEVICE=0489:e111
 ```
 
 说明：
@@ -105,8 +108,82 @@ FIX_SCRIPT=/path/to/fix_mt7925_bluetooth.sh
 - 默认会优先使用 `/home/abc/miniconda3/bin/python`，否则查找 `python3` 或 `python`。
 - BLE 扫描和连接通常需要权限，脚本默认通过 `sudo` 执行相关命令。
 - 当前文件夹已包含 [fix_mt7925_bluetooth.sh](/home/abc/桌面/SWING_CONTROL/model/fix_mt7925_bluetooth.sh:1)。自动化脚本会在第 1 步自动调用它。
+- 蓝牙恢复逻辑参照 `/home/abc/桌面/LowAir-GS/pyparrot`：针对 MT7925/`0489:e111` 执行 `btusb` 绑定、禁用 USB autosuspend、重载蓝牙模块、解除 rfkill、启动 `bluetooth.service` 并验证 HCI 控制器。
+- 如果扫描不到 Swing，自动化入口会再执行一次蓝牙恢复并重扫一次。
 
-## 4. 手动流程：启用蓝牙
+如果 `bluetoothctl show` 仍显示 `No default controller available`，可以尝试：
+
+```bash
+sudo ./model/fix_mt7925_bluetooth.sh --update-firmware
+sudo ./model/fix_mt7925_bluetooth.sh --install-persistent
+```
+
+## 4. 中文指令实际操作
+
+如果要从中文指令直接进入无人机实际操作，使用：
+
+```bash
+cd /home/abc/桌面/SWING_CONTROL
+./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
+```
+
+这个入口复用了上面的实机模式：
+
+```text
+蓝牙修复
+  -> 自动扫描 Swing 地址
+  -> 连接测试
+  -> 中文指令解析
+  -> 动作安全校验
+  -> dry-run 动作预览
+  -> 输入“确认执行”
+  -> pyparrot 执行动作
+```
+
+已知 Swing 地址时可以跳过扫描：
+
+```bash
+./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute --addr E0:14:89:09:3D:CB
+```
+
+## 5. 连续中文交互控制
+
+如果要连续输入中文指令，使用：
+
+```bash
+cd /home/abc/桌面/SWING_CONTROL
+./model/run_swing_interactive.sh
+```
+
+默认只 dry-run，不连接无人机。真机交互执行使用：
+
+```bash
+./model/run_swing_interactive.sh --execute
+```
+
+交互界面会提示：
+
+```text
+飞行指令>
+```
+
+可输入：
+
+```text
+起飞后悬停2秒再降落
+向前飞1秒
+右转1秒
+```
+
+每条真机指令都会先显示动作 JSON 和 pyparrot 预览，再要求输入：
+
+```text
+确认执行
+```
+
+输入 `q` 或 `退出` 结束交互。
+
+## 6. 手动流程：启用蓝牙
 
 先尝试打开蓝牙：
 
@@ -136,7 +213,7 @@ Bluetooth controller looks usable.
 
 成功后不要再手动重启 `bluetooth.service`，直接运行自动化脚本。
 
-## 5. 手动流程：扫描 Swing 地址
+## 7. 手动流程：扫描 Swing 地址
 
 打开 Swing 飞机电源，然后扫描：
 
@@ -162,7 +239,7 @@ scan on
 
 看到名字包含 `Swing` 的设备后，记录它的 MAC 地址。
 
-## 6. 手动流程：只测试连接
+## 8. 手动流程：只测试连接
 
 本地飞行 demo 支持只连接、不起飞：
 
@@ -184,7 +261,7 @@ disconnect
 /home/abc/miniconda3/bin/python model/demoSwingDirectFlight.py --addr E0:14:89:09:3D:CB --connect-only
 ```
 
-## 7. 手动流程：运行飞行示例
+## 9. 手动流程：运行飞行示例
 
 确认飞机在安全区域，周围无人、无玻璃和易碎物后运行：
 
@@ -204,7 +281,7 @@ sudo /home/abc/miniconda3/bin/python model/demoSwingDirectFlight.py --addr E0:14
 7. 安全降落
 8. 断开连接
 
-## 8. 自定义控制脚本模板
+## 10. 自定义控制脚本模板
 
 可以基于下面结构写自己的控制脚本：
 
@@ -254,7 +331,7 @@ swing.set_plane_gear_box("gear_2")
 swing.set_plane_gear_box("gear_3")
 ```
 
-## 9. 安全建议
+## 11. 安全建议
 
 - 第一次测试先跑 `--connect-only`，再跑完整飞行示例。
 - 飞行前确认 Swing 电量充足。

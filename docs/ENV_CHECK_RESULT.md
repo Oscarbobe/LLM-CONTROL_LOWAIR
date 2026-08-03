@@ -1,6 +1,6 @@
 # 环境检查结果
 
-检查时间：2026-08-02
+检查时间：2026-08-03
 
 ## 1. 系统命令
 
@@ -14,25 +14,59 @@
 - `modprobe`
 - `timeout`
 - `ffmpeg`
-
-缺少：
-
+- `arecord`
+- `parec`
+- `pactl`
 - `ollama`
+- `whisper`
 
-## 2. 硬件与驱动
+## 2. 蓝牙状态
 
-已检测到 NVIDIA GPU：
+当前蓝牙控制器已可用：
 
 ```text
-NVIDIA GeForce RTX 5060 Laptop GPU, 8151 MiB, Driver 595.84
+Controller 48:45:E6:6D:8B:70
+Powered: yes
 ```
 
-## 3. base 环境
+## 3. Ollama 与模型
+
+已安装：
+
+```text
+ollama 0.32.5
+qwen3.5:4b
+```
+
+## 4. 麦克风与 ASR
+
+已检测到麦克风：
+
+```text
+card 1: PCH [HDA Intel PCH], device 0: ALC257 Analog
+```
+
+已安装：
+
+```text
+openai-whisper 20250625
+torch 2.13.0+cu130
+torch cuda=True
+```
+
+语音控制环境自检命令：
+
+```bash
+cd /home/abc/桌面/SWING_CONTROL
+./model/run_swing_voice.sh --check-env
+```
+
+## 5. base Python 环境
 
 Python：
 
 ```text
-Python 3.13.13
+/home/abc/miniconda3/bin/python
 ```
 
 已安装：
@@ -43,79 +77,35 @@ Python 3.13.13
 - `zeroconf`
 - `cv2`
 - `numpy`
+- `torch`
+- `openai-whisper`
+- `networkx`
 - `pydantic`
 - `rich`
 
-缺少：
+仍缺少的扩展依赖：
 
 - `PyYAML`
+- `ollama` Python 包
+- `transformers`
 - `SpeechRecognition`
 - `jieba`
-- `networkx`
-- `pandas`
-- `scipy`
-- `torch`
-- `transformers`
-- `openai-whisper`
-- `ollama`
-
-说明：不建议把大模型依赖安装到 base 环境，因为当前 base 是 Python 3.13。
-
-## 4. swing-control-llm 环境
-
-该环境已存在：
-
-```text
-/home/abc/miniconda3/envs/swing-control-llm
-Python 3.11.15
-```
-
-已安装：
-
-- `PyYAML`
-- `networkx`
 - `pandas`
 - `scipy`
 
-缺少：
+说明：
 
-- `SpeechRecognition`
-- `jieba`
-- `pydantic`
-- `rich`
-- `torch`
-- `transformers`
-- `openai-whisper`
-- `ollama`
-- `accelerate`
-- `sentencepiece`
+- 当前项目调用 Ollama 使用 HTTP/CLI，不强依赖 Python `ollama` 包。
+- 当前语音控制使用 `openai-whisper`，不强依赖 `SpeechRecognition`。
+- `PyYAML`、`transformers`、`jieba`、`pandas`、`scipy` 主要用于后续配置解析、模型扩展、中文分词、数据处理和路径规划扩展。
 
-## 5. 额外问题
-
-在 `swing-control-llm` 环境中执行：
-
-```bash
-conda run -n swing-control-llm which pip
-```
-
-结果指向：
+## 6. 当前可运行能力
 
 ```text
-/home/abc/.local/bin/pip
+中文文本交互 dry-run: 可运行
+中文文本交互真机执行: 可运行，需 Swing 开机并确认执行
+麦克风语音控制 dry-run: 环境已具备
+麦克风语音控制真机执行: 环境已具备，需真机安全区域
+蓝牙恢复: 已接入
+pyparrot 真机飞行: 已接入
 ```
-
-这说明直接运行 `pip` 可能不会安装到当前 conda 环境。后续安装必须使用：
-
-```bash
-conda run -n swing-control-llm python -m pip install ...
-```
-
-或先激活环境后使用：
-
-```bash
-conda activate swing-control-llm
-python -m pip install ...
-```
-
-不要直接使用裸 `pip install ...`。
-

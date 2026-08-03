@@ -1,0 +1,74 @@
+{
+  "name": "demo_mountain_test_site",
+  "coordinate_system": "local_meters",
+  "origin": {
+    "name": "起飞点",
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "flight": {
+    "safe_height_m": 1.5,
+    "default_hover_s": 2,
+    "takeoff_duration_s": 5,
+    "land_duration_s": 5,
+    "default_speed": 20,
+    "meters_per_second": 1
+  },
+  "limits": {
+    "min_x": -6,
+    "max_x": 6,
+    "min_y": -6,
+    "max_y": 6,
+    "min_z": 0,
+    "max_z": 3
+  },
+  "areas": [
+    {
+      "name": "果园",
+      "aliases": ["果树区", "苹果园", "梨园"],
+      "center": {"x": 3, "y": 2, "z": 1.5},
+      "radius_m": 1.2
+    },
+    {
+      "name": "玉米地",
+      "aliases": ["玉米田", "农田", "庄稼地"],
+      "center": {"x": -3, "y": 2.5, "z": 1.5},
+      "radius_m": 1.5
+    },
+    {
+      "name": "水渠",
+      "aliases": ["水沟", "灌溉渠", "渠边"],
+      "center": {"x": 1, "y": -3.5, "z": 1.3},
+      "radius_m": 1.0
+    },
+    {
+      "name": "起飞点",
+      "aliases": ["原点", "返航点", "降落点"],
+      "center": {"x": 0, "y": 0, "z": 1.2},
+      "radius_m": 0.5
+    }
+  ],
+  "no_fly_zones": [
+    {
+      "name": "房屋",
+      "center": {"x": 1.5, "y": 1.2, "z": 0},
+      "radius_m": 0.8,
+      "buffer_m": 0.5
+    },
+    {
+      "name": "电线杆",
+      "center": {"x": -1.5, "y": 0.8, "z": 0},
+      "radius_m": 0.5,
+      "buffer_m": 0.5
+    }
+  ],
+  "landing_points": [
+    {
+      "name": "起飞点",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  ]
+}

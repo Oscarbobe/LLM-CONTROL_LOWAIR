@@ -16,10 +16,15 @@ if [ -z "$PYTHON_BIN" ]; then
 fi
 
 FIX_SCRIPT="${FIX_SCRIPT:-$SCRIPT_DIR/fix_mt7925_bluetooth.sh}"
+BLUETOOTH_COMMON="$SCRIPT_DIR/swing_bluetooth_common.sh"
 FLIGHT_DEMO="$SCRIPT_DIR/demoSwingDirectFlight.py"
 RUN_WITH_SUDO="${RUN_WITH_SUDO:-1}"
 SKIP_BLUETOOTH_FIX="${SKIP_BLUETOOTH_FIX:-0}"
 SWING_ADDR="${SWING_ADDR:-}"
+BLUETOOTH_DEVICE="${BLUETOOTH_DEVICE:-0489:e111}"
+UPDATE_BLUETOOTH_FIRMWARE="${UPDATE_BLUETOOTH_FIRMWARE:-0}"
+INSTALL_BLUETOOTH_FIX="${INSTALL_BLUETOOTH_FIX:-0}"
+RETRY_BLUETOOTH_RECOVERY="${RETRY_BLUETOOTH_RECOVERY:-1}"
 
 log() {
   printf '[%s] %s\n' "$(date '+%F %T')" "$*"
@@ -28,29 +33,6 @@ log() {
 die() {
   log "ERROR: $*"
   exit 1
-}
-
-strip_ansi() {
-  sed -r 's/\x1B\[[0-9;]*[mK]//g; s/\x01//g; s/\x02//g'
-}
-
-scan_with_pyparrot() {
-  log "Scanning Swing with pyparrot..."
-  run_privileged "$PYTHON_BIN" -m pyparrot.scripts.findMinidrone 2>&1 || true
-}
-
-scan_with_bluetoothctl() {
-  log "Scanning Swing with bluetoothctl for 20 seconds..."
-  timeout 20 bluetoothctl scan on 2>&1 || true
-  bluetoothctl scan off >/dev/null 2>&1 || true
-}
-
-extract_swing_addr() {
-  awk '
-    /FOUND A SWING/ { found = 1; next }
-    found && /Device/ { print $2; exit }
-    /Device [0-9A-Fa-f:]+ .*Swing/ { print $2; exit }
-  '
 }
 
 write_swing_addr() {
@@ -112,15 +94,20 @@ run_privileged() {
   fi
 }
 
+# shellcheck source=/dev/null
+[ -f "$BLUETOOTH_COMMON" ] || die "Bluetooth common script not found: $BLUETOOTH_COMMON"
+source "$BLUETOOTH_COMMON"
+
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [--addr MAC] [--no-sudo] [--skip-bluetooth-fix]
+Usage: $(basename "$0") [--addr MAC] [--no-sudo] [--skip-bluetooth-fix] [--bluetooth-device VID:PID] [--update-bluetooth-firmware] [--install-bluetooth-fix] [--no-bluetooth-retry]
 
 Environment:
   PYTHON_BIN=/path/to/python       Python with pyparrot installed
   SWING_ADDR=E0:14:89:09:3D:CB     Skip scanning and use this Swing address
   RUN_WITH_SUDO=0                  Run BLE commands without sudo
   FIX_SCRIPT=/path/to/script.sh    Optional Bluetooth repair script
+  BLUETOOTH_DEVICE=0489:e111       USB Bluetooth VID:PID for MT7925 recovery
 EOF
 }
 
@@ -140,6 +127,23 @@ main() {
         SKIP_BLUETOOTH_FIX=1
         shift
         ;;
+      --bluetooth-device)
+        [ "$#" -ge 2 ] || die "--bluetooth-device requires VID:PID"
+        BLUETOOTH_DEVICE="$2"
+        shift 2
+        ;;
+      --update-bluetooth-firmware)
+        UPDATE_BLUETOOTH_FIRMWARE=1
+        shift
+        ;;
+      --install-bluetooth-fix)
+        INSTALL_BLUETOOTH_FIX=1
+        shift
+        ;;
+      --no-bluetooth-retry)
+        RETRY_BLUETOOTH_RECOVERY=0
+        shift
+        ;;
       -h|--help)
         usage
         exit 0
@@ -157,29 +161,14 @@ main() {
   "$PYTHON_BIN" -c "from pyparrot.Minidrone import Swing" >/dev/null || die "pyparrot is not importable with $PYTHON_BIN"
 
   log "Step 1/5: enabling Bluetooth."
-  if [ "$SKIP_BLUETOOTH_FIX" = "1" ]; then
-    log "Skipping Bluetooth fix because --skip-bluetooth-fix was set."
-  elif [ -x "$FIX_SCRIPT" ]; then
-    run_privileged "$FIX_SCRIPT" || die "Bluetooth fix failed. Do not continue to flight."
-  else
-    log "No local Bluetooth fix script found at $FIX_SCRIPT; powering on Bluetooth directly."
-    bluetoothctl power on >/dev/null 2>&1 || true
-  fi
+  prepare_bluetooth_controller || die "Bluetooth recovery failed. Do not continue to flight."
 
   if [ -n "$SWING_ADDR" ]; then
     swing_addr="$SWING_ADDR"
     log "Step 2/5: using Swing address from argument or environment."
   else
     log "Step 2/5: scanning Swing address."
-    scan_output="$(
-      {
-        scan_with_pyparrot
-        scan_with_bluetoothctl
-      } | strip_ansi
-    )"
-    printf '%s\n' "$scan_output"
-
-    swing_addr="$(printf '%s\n' "$scan_output" | extract_swing_addr | head -n 1)"
+    swing_addr="$(find_swing_addr_with_recovery || true)"
     if [ -z "$swing_addr" ]; then
       die "Could not find a Swing device. Turn on Swing, keep it nearby, and retry."
     fi
