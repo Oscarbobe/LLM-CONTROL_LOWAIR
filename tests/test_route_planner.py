@@ -85,6 +85,35 @@ def test_plan_route_to_area_with_no_fly_zone_detour():
         )
 
 
+def test_generated_axis_actions_avoid_real_map_no_fly_zones():
+    """The executable axis-aligned route must be safe, not only A* waypoints."""
+    site_map = load_site_map()
+    area = site_map.find_area("果园")
+    assert area is not None
+
+    result = plan_route_to_area(site_map, area, hover_s=2)
+    x = site_map.origin.x
+    y = site_map.origin.y
+    mps = site_map.flight.meters_per_second
+
+    for action in result.actions:
+        duration = float(action["parameters"].get("duration_s", 0))
+        distance = duration * mps
+        tool = action["tool"]
+        if tool == "fly_forward":
+            x += distance
+        elif tool == "fly_backward":
+            x -= distance
+        elif tool == "fly_right":
+            y += distance
+        elif tool == "fly_left":
+            y -= distance
+
+        for zone in site_map.no_fly_zones:
+            separation = ((x - zone.center.x) ** 2 + (y - zone.center.y) ** 2) ** 0.5
+            assert separation > zone.protected_radius_m
+
+
 def test_route_has_pre_flight_check():
     site_map = _make_site_map()
     area = site_map.find_area("cornfield")

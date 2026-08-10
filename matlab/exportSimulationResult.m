@@ -19,7 +19,7 @@ writematrix(result.trajectory, csvPath);
 jsonPath = fullfile(simDir, 'latest_result.json');
 export = struct();
 export.ok = result.ok;
-export.safetyErrors = {result.safetyErrors};
+export.safetyErrors = cellstr(result.safetyErrors);
 export.finalPose = result.finalPose;
 export.finalHeadingDeg = result.finalHeadingDeg;
 export.airborne = result.airborne;

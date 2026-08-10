@@ -2,8 +2,8 @@ function actionsToVelocityCmd(actionFile, mapFile)
 %ACTIONSTOVELOCITYCMD Convert Swing action JSON to velocity command time series.
 %
 % Usage:
-%   actionsToVelocityCmd('../data/processed/instructions/map_last_actions.json', ...
-%                        '../data/maps/site_map.json')
+%   actionsToVelocityCmd('data/processed/instructions/map_last_actions.json', ...
+%                        'data/maps/site_map.json')
 %
 % Returns velocity command matrix in base workspace as 'velCmd':
 %   velCmd = [t, vx, vy, vz]  (meters/second)
@@ -11,10 +11,10 @@ function actionsToVelocityCmd(actionFile, mapFile)
 % This is the input signal for the Simulink model swing_language_control_sim.
 
 if nargin < 1
-    actionFile = '../data/processed/instructions/map_last_actions.json';
+    actionFile = 'data/processed/instructions/map_last_actions.json';
 end
 if nargin < 2
-    mapFile = '../data/maps/site_map.json';
+    mapFile = 'data/maps/site_map.json';
 end
 
 scriptDir = fileparts(mfilename('fullpath'));

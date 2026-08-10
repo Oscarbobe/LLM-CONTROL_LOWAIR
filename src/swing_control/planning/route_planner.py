@@ -180,15 +180,35 @@ def _segment_actions(site_map: SiteMap, start: Point3D, end: Point3D) -> list[di
     dx = end.x - start.x
     dy = end.y - start.y
 
-    if abs(dx) >= 0.05:
-        tool = "fly_forward" if dx > 0 else "fly_backward"
-        actions.extend(_motion_chunks(tool, abs(dx), site_map))
+    x_action = ("fly_forward" if dx > 0 else "fly_backward", abs(dx))
+    y_action = ("fly_right" if dy > 0 else "fly_left", abs(dy))
 
-    if abs(dy) >= 0.05:
-        tool = "fly_right" if dy > 0 else "fly_left"
-        actions.extend(_motion_chunks(tool, abs(dy), site_map))
+    # Swing actions are axis-aligned.  A diagonal A* segment therefore becomes
+    # two orthogonal moves; choose the corner whose two legs remain clear of
+    # every protected no-fly zone.  Always using x-then-y can cut through an
+    # obstacle even when the original diagonal segment is collision-free.
+    x_corner = Point3D(end.x, start.y, start.z)
+    y_corner = Point3D(start.x, end.y, start.z)
+    x_then_y_safe = _polyline_is_safe(site_map, (start, x_corner, end))
+    y_then_x_safe = _polyline_is_safe(site_map, (start, y_corner, end))
+
+    ordered = (x_action, y_action)
+    if not x_then_y_safe and y_then_x_safe:
+        ordered = (y_action, x_action)
+
+    for tool, distance in ordered:
+        if distance >= 0.05:
+            actions.extend(_motion_chunks(tool, distance, site_map))
 
     return actions
+
+
+def _polyline_is_safe(site_map: SiteMap, points: tuple[Point3D, ...], safety_margin: float = 0.05) -> bool:
+    for start, end in zip(points, points[1:]):
+        for zone in site_map.no_fly_zones:
+            if _segment_intersects_zone(start, end, zone, safety_margin=safety_margin):
+                return False
+    return True
 
 
 def _motion_chunks(tool: str, distance_m: float, site_map: SiteMap) -> list[dict]:
@@ -210,7 +230,13 @@ def _motion_chunks(tool: str, distance_m: float, site_map: SiteMap) -> list[dict
     return chunks
 
 
-def _segment_intersects_zone(start: Point3D, end: Point3D, zone: NoFlyZone) -> bool:
+def _segment_intersects_zone(
+    start: Point3D,
+    end: Point3D,
+    zone: NoFlyZone,
+    *,
+    safety_margin: float = 0.0,
+) -> bool:
     sx, sy = start.x, start.y
     ex, ey = end.x, end.y
     cx, cy = zone.center.x, zone.center.y
@@ -218,13 +244,13 @@ def _segment_intersects_zone(start: Point3D, end: Point3D, zone: NoFlyZone) -> b
     dy = ey - sy
     length_sq = dx * dx + dy * dy
     if length_sq == 0:
-        return ((sx - cx) ** 2 + (sy - cy) ** 2) ** 0.5 <= zone.protected_radius_m
+        return ((sx - cx) ** 2 + (sy - cy) ** 2) ** 0.5 <= zone.protected_radius_m + safety_margin
 
     t = ((cx - sx) * dx + (cy - sy) * dy) / length_sq
     t = max(0.0, min(1.0, t))
     closest = Point3D(sx + t * dx, sy + t * dy, start.z)
     distance = ((closest.x - cx) ** 2 + (closest.y - cy) ** 2) ** 0.5
-    return distance <= zone.protected_radius_m
+    return distance <= zone.protected_radius_m + safety_margin
 
 
 def _axis_path_intersects_zone(start: Point3D, end: Point3D, zone: NoFlyZone) -> bool:

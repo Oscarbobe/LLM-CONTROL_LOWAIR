@@ -10,13 +10,6 @@
     }
   },
   {
-    "tool": "fly_forward",
-    "parameters": {
-      "duration_s": 1.5,
-      "speed": 20.0
-    }
-  },
-  {
     "tool": "fly_left",
     "parameters": {
       "duration_s": 0.5,
@@ -26,7 +19,7 @@
   {
     "tool": "fly_forward",
     "parameters": {
-      "duration_s": 1.5,
+      "duration_s": 3.0,
       "speed": 20.0
     }
   },
