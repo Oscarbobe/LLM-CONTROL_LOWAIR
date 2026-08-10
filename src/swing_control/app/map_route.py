@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 
 from swing_control.app.dry_run_actions import print_steps
 from swing_control.planning.action_planner import plan_actions
@@ -15,6 +16,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Plan Swing actions from a named map target.")
     parser.add_argument("instruction", help="Chinese instruction containing a map area name.")
     parser.add_argument("--map", default="data/maps/site_map.json", help="Path to site map JSON.")
+    parser.add_argument("--save-actions", default=None, help="Save the generated action JSON to a file.")
     args = parser.parse_args()
 
     result = plan_route_from_instruction(args.instruction, map_path=args.map)
@@ -29,8 +31,15 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
+    action_json = json.dumps(result.actions, indent=2, ensure_ascii=False)
     print("\n动作 JSON：")
-    print(json.dumps(result.actions, indent=2, ensure_ascii=False))
+    print(action_json)
+
+    if args.save_actions:
+        save_path = Path(args.save_actions)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        save_path.write_text(action_json, encoding="utf-8")
+        print(f"\n动作已保存到: {save_path}")
 
     validation = validate_action_sequence(result.actions)
     print("\n校验结果：", "通过" if validation.ok else "失败")

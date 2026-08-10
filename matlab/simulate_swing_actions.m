@@ -81,6 +81,8 @@ result.airborne = state.airborne;
 result.safetyErrors = unique(safetyErrors);
 result.ok = isempty(result.safetyErrors) && ~state.airborne && abs(state.pose(3) - siteMap.origin.z) < 1e-6;
 
+exportSimulationResult(result, projectRoot);
+
 fprintf("\nAction sequence:\n");
 for i = 1:numel(actionLog)
     fprintf("  %s\n", actionLog(i));

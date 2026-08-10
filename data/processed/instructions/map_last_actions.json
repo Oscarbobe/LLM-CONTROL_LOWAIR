@@ -1,0 +1,80 @@
+[
+  {
+    "tool": "pre_flight_check",
+    "parameters": {}
+  },
+  {
+    "tool": "takeoff",
+    "parameters": {
+      "duration_s": 5.0
+    }
+  },
+  {
+    "tool": "fly_forward",
+    "parameters": {
+      "duration_s": 1.5,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_left",
+    "parameters": {
+      "duration_s": 0.5,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_forward",
+    "parameters": {
+      "duration_s": 1.5,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_right",
+    "parameters": {
+      "duration_s": 0.5,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_forward",
+    "parameters": {
+      "duration_s": 0.2,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_right",
+    "parameters": {
+      "duration_s": 1.17,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_backward",
+    "parameters": {
+      "duration_s": 0.2,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "fly_right",
+    "parameters": {
+      "duration_s": 0.83,
+      "speed": 20.0
+    }
+  },
+  {
+    "tool": "hover",
+    "parameters": {
+      "duration_s": 2.0
+    }
+  },
+  {
+    "tool": "land",
+    "parameters": {
+      "duration_s": 5.0
+    }
+  }
+]

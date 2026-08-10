@@ -1,4 +1,4 @@
-"""Generate simple Swing action routes from named map targets."""
+"""Generate Swing action routes from named map targets with A* path planning."""
 
 from __future__ import annotations
 
@@ -6,7 +6,17 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from swing_control.mapping.site_map import DEFAULT_SITE_MAP_PATH, NamedArea, NoFlyZone, Point3D, SiteMap, load_site_map
+from swing_control.mapping.site_map import (
+    DEFAULT_SITE_MAP_PATH,
+    NamedArea,
+    NoFlyZone,
+    Point3D,
+    SiteMap,
+    load_site_map,
+)
+from swing_control.planning.path_planner import plan_astar_path
+from swing_control.planning.trajectory_smoother import smooth_waypoints
+from swing_control.planning.wind_model import WindField, apply_wind_to_waypoints
 
 
 @dataclass
@@ -23,16 +33,34 @@ def plan_route_from_instruction(
     instruction: str,
     *,
     map_path: str | Path = DEFAULT_SITE_MAP_PATH,
+    use_astar: bool = True,
+    return_to_home: bool = False,
+    wind: WindField | None = None,
 ) -> RoutePlanResult:
     site_map = load_site_map(map_path)
     area = site_map.find_area(instruction)
     if area is None:
         return RoutePlanResult(False, errors=["指令中没有匹配到地图区域"])
 
-    return plan_route_to_area(site_map, area, hover_s=_extract_hover_seconds(instruction) or site_map.flight.default_hover_s)
+    return plan_route_to_area(
+        site_map,
+        area,
+        hover_s=_extract_hover_seconds(instruction) or site_map.flight.default_hover_s,
+        use_astar=use_astar,
+        return_to_home=return_to_home,
+        wind=wind,
+    )
 
 
-def plan_route_to_area(site_map: SiteMap, area: NamedArea, *, hover_s: float | None = None) -> RoutePlanResult:
+def plan_route_to_area(
+    site_map: SiteMap,
+    area: NamedArea,
+    *,
+    hover_s: float | None = None,
+    use_astar: bool = True,
+    return_to_home: bool = False,
+    wind: WindField | None = None,
+) -> RoutePlanResult:
     target = Point3D(
         x=area.center.x,
         y=area.center.y,
@@ -52,29 +80,62 @@ def plan_route_to_area(site_map: SiteMap, area: NamedArea, *, hover_s: float | N
     if errors:
         return RoutePlanResult(False, target_area=area.name, errors=errors)
 
-    waypoints = _build_waypoints(site_map, target, warnings)
+    waypoints = _build_waypoints(site_map, target, warnings, use_astar=use_astar, return_to_home=return_to_home)
+
+    if wind is not None and (wind.vx != 0 or wind.vy != 0 or wind.gust_std != 0):
+        waypoints = apply_wind_to_waypoints(waypoints, wind)
+        warnings.append(f"已应用风扰动: vx={wind.vx}m/s, vy={wind.vy}m/s, gust={wind.gust_std}m/s")
+
     actions = _waypoints_to_actions(site_map, waypoints, hover_duration)
     return RoutePlanResult(True, actions=actions, target_area=area.name, waypoints=waypoints, warnings=warnings)
 
 
-def _build_waypoints(site_map: SiteMap, target: Point3D, warnings: list[str]) -> list[Point3D]:
+def _build_waypoints(
+    site_map: SiteMap,
+    target: Point3D,
+    warnings: list[str],
+    *,
+    use_astar: bool = True,
+    return_to_home: bool = False,
+) -> list[Point3D]:
     origin = Point3D(site_map.origin.x, site_map.origin.y, max(site_map.origin.z, site_map.flight.safe_height_m))
+
+    # Try A* first if enabled and multiple no-fly zones exist
+    if use_astar and len(site_map.no_fly_zones) >= 1:
+        astar_path = plan_astar_path(site_map, origin, target)
+        if astar_path and len(astar_path) >= 2:
+            smoothed = smooth_waypoints(astar_path, site_map)
+            warnings.append(f"A* 路径规划成功，{len(smoothed)} 个航点（已平滑）")
+            if return_to_home:
+                smoothed.append(_find_landing_point(site_map, smoothed[-1]))
+                warnings.append("已添加返航点")
+            return smoothed
+
+    # Fallback: original axis-aligned detour logic
     waypoints = [origin]
 
-    blocking_zone = next(
-        (zone for zone in site_map.no_fly_zones if _axis_path_intersects_zone(origin, target, zone)),
-        None,
-    )
-    if blocking_zone is not None:
-        detour = _detour_waypoints(site_map, origin, blocking_zone, target)
-        if detour:
-            waypoints.extend(detour)
-            warnings.append(f"直线路径经过禁飞区 {blocking_zone.name}，已加入绕行航点")
-        else:
-            warnings.append(f"直线路径接近禁飞区 {blocking_zone.name}，但未找到可用绕行点")
+    for zone in site_map.no_fly_zones:
+        if _axis_path_intersects_zone(origin, target, zone):
+            detour = _detour_waypoints(site_map, origin, zone, target)
+            if detour:
+                waypoints.extend(detour)
+                warnings.append(f"直线路径经过禁飞区 {zone.name}，已加入绕行航点")
+            else:
+                warnings.append(f"直线路径接近禁飞区 {zone.name}，但未找到可用绕行点")
 
     waypoints.append(target)
+
+    if return_to_home:
+        waypoints.append(_find_landing_point(site_map, waypoints[-1]))
+        warnings.append("已添加返航点")
+
     return waypoints
+
+
+def _find_landing_point(site_map: SiteMap, current: Point3D) -> Point3D:
+    if site_map.landing_points:
+        return site_map.landing_points[0]
+    return Point3D(site_map.origin.x, site_map.origin.y, max(site_map.origin.z, site_map.flight.safe_height_m))
 
 
 def _waypoints_to_actions(site_map: SiteMap, waypoints: list[Point3D], hover_s: float) -> list[dict]:
@@ -90,7 +151,28 @@ def _waypoints_to_actions(site_map: SiteMap, waypoints: list[Point3D], hover_s: 
 
     actions.append({"tool": "hover", "parameters": {"duration_s": hover_s}})
     actions.append({"tool": "land", "parameters": {"duration_s": site_map.flight.land_duration_s}})
-    return actions
+    return _merge_consecutive_actions(actions)
+
+
+def _merge_consecutive_actions(actions: list[dict]) -> list[dict]:
+    if len(actions) <= 1:
+        return actions
+
+    merged: list[dict] = [actions[0]]
+    for action in actions[1:]:
+        prev = merged[-1]
+        if (
+            action["tool"] == prev["tool"]
+            and action["tool"] in {"fly_forward", "fly_backward", "fly_left", "fly_right"}
+            and action["parameters"].get("speed") == prev["parameters"].get("speed")
+        ):
+            prev["parameters"]["duration_s"] = round(
+                prev["parameters"]["duration_s"] + action["parameters"]["duration_s"], 2
+            )
+        else:
+            merged.append(action)
+
+    return merged
 
 
 def _segment_actions(site_map: SiteMap, start: Point3D, end: Point3D) -> list[dict]:

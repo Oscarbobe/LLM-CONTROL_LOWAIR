@@ -1,12 +1,12 @@
 # SWING_CONTROL 技术文档
 
-本文档汇总本项目在多轮交互后形成的完整技术逻辑，覆盖项目目的、运行链路、目录结构、代码文件职责、核心函数、真机蓝牙恢复、Ollama 接入、动作校验、dry-run、人工确认、pyparrot 执行和日志保存方式。
+本文档汇总本项目在多轮交互后形成的完整技术逻辑，覆盖项目目的、运行链路、目录结构、代码文件职责、核心函数、MATLAB/Simulink 仿真、真机蓝牙恢复、Ollama 接入、动作校验、dry-run、人工确认、pyparrot 执行和日志保存方式。
 
 ## 1. 项目目的
 
-本项目目标是构建一个“自然语言/语音 -> 动作解析 -> 安全校验 -> 动作预演 -> 人工确认 -> Parrot Swing 真机执行”的山区无人机智能控制原型。
+本项目目标是构建一个“自然语言/语音 -> 动作解析 -> 安全校验 -> MATLAB/Simulink 仿真验证”的山区无人机智能控制原型。
 
-当前项目聚焦 Parrot Swing 小型无人机，先实现室内/近距离 BLE 控制的可演示闭环。更完整的山区农业应用目标包括：农户用中文口语下达巡田、悬停、移动、转向、起降等指令，系统将自然语言转成结构化动作，再经过安全规则限制和人工确认，最终调用 `pyparrot` 控制 Swing。
+当前项目聚焦 Parrot Swing 小型无人机，先实现室内/近距离 BLE 控制的可演示闭环。更完整的山区农业应用目标包括：农户用中文口语下达巡田、悬停、移动、转向、起降等指令，系统将自然语言转成结构化动作，再经过安全规则限制和人工确认，最终在 MATLAB/Simulink 中仿真验证飞行轨迹和安全性，真机执行仅作为可选环节。
 
 当前已实现的核心能力：
 
@@ -15,6 +15,7 @@
 - 麦克风说话控制 CLI，支持录音、Whisper 转文字、预览、确认和执行。
 - Ollama 本地模型调用，默认模型为 `qwen3.5:4b`。
 - 当模型输出不稳定时，使用规则兜底解析常见中文飞行动作。
+- 地图目标区域识别与路径规划，支持禁飞区绕行。
 - 动作 JSON 安全校验。
 - dry-run 输出动作序列和对应 pyparrot 调用预览。
 - 真机执行前强制人工输入 `确认执行`。
@@ -22,12 +23,19 @@
 - 异常时尝试安全降落。
 - `data/logs` 保存 JSONL 运行日志。
 - 参照 `/home/abc/桌面/LowAir-GS/pyparrot` 的 MT7925 蓝牙恢复逻辑，加入本项目自动化脚本。
+- **MATLAB 脚本仿真代码**：三维轨迹绘制、地图安全检查、PASS/FAIL 结论。
+- **MATLAB 结果导出代码**：轨迹 CSV、结果 JSON、仿真 PNG 自动导出到 `data/simulation/`。
+- **Simulink 构建脚本**：提供动作速度命令转换和 `.slx` 模型构建脚本，用于后续动态仿真展示。
+- A*/网格路径规划、轨迹平滑与风扰动模型的初步代码结构。
 
 当前未完整实现但保留结构的能力：
 
 - 真实 GPS/GIS 地图。
-- 定位闭环下的复杂路径规划、避障、返航路径。
+- 定位闭环下的真实避障、返航路径和实际飞行误差校正。
 - 多无人机调度或高级任务规划。
+- Simulink 动态仿真模型的实际 `.slx` 文件生成与 GUI 实测。
+- MATLAB 仿真在 MATLAB GUI 中的实际运行验证（当前 shell 未检测到 `matlab`/`octave` 命令）。
+- 自动化测试运行环境仍缺少 `pytest`、`PyYAML`、`pandas`、`scipy` 等依赖。
 
 ## 2. 项目运行总逻辑
 
@@ -202,12 +210,17 @@ run_swing_direct_flight.sh
 SWING_CONTROL/
 ├── README.md
 ├── TECHNICAL_DOCUMENTATION.md
+├── OPENCODE_PROJECT_STATUS_GUIDE.md
+├── Makefile
+├── pyproject.toml
 ├── requirements.txt
 ├── environment.yml
 ├── environment-llm.yml
 ├── configs/
 ├── data/
 ├── docs/
+├── matlab/
+├── simulink/
 ├── model/
 ├── src/
 ├── tests/
@@ -219,10 +232,12 @@ SWING_CONTROL/
 
 - `README.md`：项目入口说明，包含快速运行、目录结构和文档索引。
 - `TECHNICAL_DOCUMENTATION.md`：本文档，作为完整技术说明。
+- `OPENCODE_PROJECT_STATUS_GUIDE.md`：面向 OpenCode 的项目现状、缺口和后续实践指导。
+- `Makefile`：常用命令入口，如 `make map-demo`、`make text-demo`、`make voice-check`、`make test`。
+- `pyproject.toml`：基础 Python 项目元信息和 pytest 配置。
 - `requirements.txt`：当前项目 Python 依赖列表，包含 pyparrot 相关依赖和后续自然语言/数据处理依赖。
 - `environment.yml`：通用 conda 环境配置。
 - `environment-llm.yml`：大模型/语音识别扩展环境配置，包含 PyTorch、transformers、openai-whisper、ollama 等。
-- `model.zip`：压缩包文件，当前不作为运行入口。
 - `三下乡项目申请.docx`：项目申请文档，用于提炼产品制作流程和项目背景。
 
 ### 3.2 `configs/`
@@ -238,10 +253,35 @@ SWING_CONTROL/
 - `data/processed/instructions/`：保存解析后的动作 JSON。
 - `data/processed/instructions/demo_actions.json`：动作 JSON 示例。
 - `data/processed/instructions/last_actions.json`：最近一次中文指令解析结果。
+- `data/processed/instructions/map_last_actions.json`：地图规划命令保存的最近一次动作序列。
 - `data/logs/`：保存 JSONL 运行日志。
 - `data/maps/`：地图数据目录，当前包含 `site_map.json` 本地演示地图。
+- `data/simulation/`：MATLAB 仿真运行后生成的轨迹 CSV、结果 JSON 和图片 PNG。该目录为生成产物，默认不入库。
 
-### 3.4 `docs/`
+### 3.4 `matlab/`
+
+MATLAB 脚本仿真目录。
+
+- `matlab/README.md`：MATLAB 仿真运行说明。
+- `matlab/simulate_swing_actions.m`：主仿真入口，读取动作 JSON 和地图 JSON。
+- `matlab/applySwingAction.m`：将动作序列转换为仿真位姿变化。
+- `matlab/applyWindDisturbance.m`：风扰动模型。
+- `matlab/checkMapSafety.m`：检查边界、禁飞区和安全状态。
+- `matlab/plotSwingSimulation.m`：绘制三维轨迹、目标区域和禁飞区。
+- `matlab/actionsToTimeline.m`：动作序列转时间序列。
+- `matlab/exportSimulationResult.m`：导出 CSV、JSON、PNG 结果。
+
+### 3.5 `simulink/`
+
+Simulink 动态仿真目录。
+
+- `simulink/README.md`：Simulink 模型搭建和运行说明。
+- `simulink/actionsToVelocityCmd.m`：动作 JSON 转 Simulink 速度命令。
+- `simulink/build_swing_simulink_model.m`：生成 `swing_language_control_sim.slx` 的构建脚本。
+
+当前状态：构建脚本已存在，仍需在 MATLAB/Simulink GUI 中运行并生成 `.slx` 文件。
+
+### 3.6 `docs/`
 
 项目专题文档目录。用于解释不同功能模块的设计和实现流程。
 
@@ -263,19 +303,33 @@ SWING_CONTROL/
 - `PROJECT_STRUCTURE.md`：项目结构说明。
 - `ENVIRONMENT.md`、`ENV_CHECK_RESULT.md`、`LLM_INSTALL.md`：环境安装与检查说明。
 
-### 3.5 `model/`
+### 3.7 `model/`
 
 真机脚本和 pyparrot demo 目录。这里是本项目直接控制 Swing 的主要 shell 入口。
 
-### 3.6 `src/swing_control/`
+### 3.8 `src/swing_control/`
 
 Python 源码目录，按功能拆分为 app、nlp、safety、planning、flight 等模块。
 
-### 3.7 `tests/`
+其中 `src/swing_control/planning/` 当前包含动作预览、地图路线规划、A*/网格路径规划、轨迹平滑和风扰动模型。
 
-测试目录，目前只有 README，占位用于后续单元测试和集成测试。
+### 3.9 `tests/`
 
-### 3.8 `assets/`
+测试目录，已包含核心单元测试：
+
+- `tests/test_action_validator.py`
+- `tests/test_instruction_parser.py`
+- `tests/test_path_planner.py`
+- `tests/test_route_planner.py`
+
+当前 shell 环境缺少 `pytest`，需要安装依赖后运行：
+
+```bash
+python -m pip install pytest PyYAML pandas scipy
+PYTHONPATH=src python -m pytest -q
+```
+
+### 3.10 `assets/`
 
 资源目录，目前只有 README，占位用于后续演示图片、界面资源、模型资源等。
 

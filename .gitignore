@@ -1,0 +1,27 @@
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local automation/session state
+.omo/
+
+# Runtime logs and generated recordings
+data/logs/*.jsonl
+data/raw/audio/*.wav
+data/raw/audio/*.txt
+
+# Generated simulation outputs
+data/simulation/
+
+# Local archives and temporary exports
+*.zip
+三下乡项目申请.md
+
+# MATLAB temporary files
+*.asv
+*.slxc
+*.autosave
