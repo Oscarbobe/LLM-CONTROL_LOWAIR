@@ -27,7 +27,7 @@ ollama run llama3.2:3b "把'起飞后悬停2秒再降落'解析成JSON"
 ## 2. 在项目中临时使用 Llama
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.parse_instruction \
   "起飞后悬停2秒再降落" \
   --model llama3.2:3b \

@@ -16,7 +16,7 @@ transcriber.py -> 使用 openai-whisper 或 whisper 命令转文字
 语音控制入口：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_voice.sh
 ```
 

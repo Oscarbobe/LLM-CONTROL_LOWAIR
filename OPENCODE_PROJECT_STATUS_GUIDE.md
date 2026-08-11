@@ -1,6 +1,6 @@
 # OpenCode 项目现状与后续实践指导
 
-本文档用于让 OpenCode 快速了解当前 `SWING_CONTROL` 项目的真实状态，并指导后续继续开发。
+本文档用于让 OpenCode 快速了解当前 `LLM-CONTROL_LOWAIR` 项目的真实状态，并指导后续继续开发。
 
 当前项目定位建议：
 
@@ -41,7 +41,7 @@ src/swing_control/app/interactive_control.py
 可运行命令：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src python -m swing_control.app.parse_instruction "起飞后悬停2秒再降落" --dry-run
 ```
 
@@ -214,7 +214,7 @@ MATLAB 读取地图 JSON
 推荐运行方式：
 
 ```matlab
-cd('/home/abc/桌面/SWING_CONTROL/matlab')
+cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
 simulate_swing_actions
 ```
 
@@ -630,7 +630,7 @@ make test
 先生成动作：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_interactive.sh --no-log
 ```
 
@@ -643,7 +643,7 @@ cd /home/abc/桌面/SWING_CONTROL
 再打开 MATLAB：
 
 ```matlab
-cd('/home/abc/桌面/SWING_CONTROL/matlab')
+cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
 simulate_swing_actions
 ```
 

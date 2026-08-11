@@ -50,7 +50,7 @@ z：高度
 ## 3. 单独测试地图规划
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.map_route "飞到果园上方悬停两秒再降落"
 ```
 

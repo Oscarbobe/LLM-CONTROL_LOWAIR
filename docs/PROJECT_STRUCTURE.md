@@ -3,7 +3,7 @@
 ## 根目录
 
 ```text
-SWING_CONTROL/
+LLM-CONTROL_LOWAIR/
 ```
 
 项目总目录，保存申报书、运行说明、依赖文件、产品代码、数据和测试文件。

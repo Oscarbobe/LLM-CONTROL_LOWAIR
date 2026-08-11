@@ -297,7 +297,7 @@ main() {
       install_persistent_service
     fi
     log "Next: run the local Swing automation:"
-    log "  cd /home/abc/桌面/SWING_CONTROL"
+    log "  cd /home/abc/桌面/LLM-CONTROL_LOWAIR"
     log "  ./model/run_swing_direct_flight.sh"
     exit 0
   fi

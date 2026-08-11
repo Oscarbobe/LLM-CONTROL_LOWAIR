@@ -3,7 +3,7 @@
 PYTHONPATH := PYTHONPATH=src
 
 help:
-	@echo "SWING_CONTROL 项目命令"
+	@echo "LLM-CONTROL_LOWAIR 项目命令"
 	@echo ""
 	@echo "  make test         运行所有测试"
 	@echo "  make map-demo     地图指令 → 动作 JSON → 保存"

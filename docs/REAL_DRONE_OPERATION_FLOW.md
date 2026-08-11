@@ -3,7 +3,7 @@
 本项目现在把 `model/` 里的直接飞行脚本模式接入到了自然语言控制流程中。推荐入口是：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
 ```
 

@@ -53,7 +53,7 @@
 ### 1. 生成动作 JSON
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 make map-demo
 ```
 
@@ -62,7 +62,7 @@ make map-demo
 在 MATLAB 命令窗口：
 
 ```matlab
-cd('/home/abc/桌面/SWING_CONTROL/simulink')
+cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/simulink')
 build_swing_simulink_model
 ```
 

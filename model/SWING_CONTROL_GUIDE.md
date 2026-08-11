@@ -21,7 +21,7 @@ E0:14:89:09:3D:CB
 进入本文件夹：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ```
 
 确认 Python 环境可用：
@@ -41,7 +41,7 @@ PYTHON_BIN=/path/to/python ./model/run_swing_direct_flight.sh --help
 推荐直接使用自动化脚本：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_direct_flight.sh
 ```
 
@@ -49,21 +49,21 @@ cd /home/abc/桌面/SWING_CONTROL
 
 1. 尝试启用蓝牙
 2. 扫描 Swing 地址
-3. 写入 Swing 地址到本地 [demoSwingDirectFlight.py](/home/abc/桌面/SWING_CONTROL/model/demoSwingDirectFlight.py:1)
+3. 写入 Swing 地址到本地 [demoSwingDirectFlight.py](/home/abc/桌面/LLM-CONTROL_LOWAIR/model/demoSwingDirectFlight.py:1)
 4. 运行只连接、不起飞的测试
 5. 连接成功后，等待你按回车确认，再运行飞行示例
 
 如果你已经知道 Swing 地址，可以跳过扫描：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_direct_flight.sh --addr E0:14:89:09:3D:CB
 ```
 
 或：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 SWING_ADDR=E0:14:89:09:3D:CB ./model/run_swing_direct_flight.sh
 ```
 
@@ -107,7 +107,7 @@ BLUETOOTH_DEVICE=0489:e111
 
 - 默认会优先使用 `/home/abc/miniconda3/bin/python`，否则查找 `python3` 或 `python`。
 - BLE 扫描和连接通常需要权限，脚本默认通过 `sudo` 执行相关命令。
-- 当前文件夹已包含 [fix_mt7925_bluetooth.sh](/home/abc/桌面/SWING_CONTROL/model/fix_mt7925_bluetooth.sh:1)。自动化脚本会在第 1 步自动调用它。
+- 当前文件夹已包含 [fix_mt7925_bluetooth.sh](/home/abc/桌面/LLM-CONTROL_LOWAIR/model/fix_mt7925_bluetooth.sh:1)。自动化脚本会在第 1 步自动调用它。
 - 蓝牙恢复逻辑参照 `/home/abc/桌面/LowAir-GS/pyparrot`：针对 MT7925/`0489:e111` 执行 `btusb` 绑定、禁用 USB autosuspend、重载蓝牙模块、解除 rfkill、启动 `bluetooth.service` 并验证 HCI 控制器。
 - 如果扫描不到 Swing，自动化入口会再执行一次蓝牙恢复并重扫一次。
 
@@ -123,7 +123,7 @@ sudo ./model/fix_mt7925_bluetooth.sh --install-persistent
 如果要从中文指令直接进入无人机实际操作，使用：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
 ```
 
@@ -151,7 +151,7 @@ cd /home/abc/桌面/SWING_CONTROL
 如果要连续输入中文指令，使用：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_interactive.sh
 ```
 
@@ -201,7 +201,7 @@ Powered: yes
 如果系统提示没有默认控制器，或内置 MediaTek/MT7925 蓝牙初始化失败，可以手动运行本地蓝牙修复脚本：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 sudo ./model/fix_mt7925_bluetooth.sh
 ```
 
@@ -218,7 +218,7 @@ Bluetooth controller looks usable.
 打开 Swing 飞机电源，然后扫描：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 sudo /home/abc/miniconda3/bin/python -m pyparrot.scripts.findMinidrone
 ```
 
@@ -244,7 +244,7 @@ scan on
 本地飞行 demo 支持只连接、不起飞：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 sudo /home/abc/miniconda3/bin/python model/demoSwingDirectFlight.py --addr E0:14:89:09:3D:CB --connect-only
 ```
 
@@ -266,7 +266,7 @@ disconnect
 确认飞机在安全区域，周围无人、无玻璃和易碎物后运行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 sudo /home/abc/miniconda3/bin/python model/demoSwingDirectFlight.py --addr E0:14:89:09:3D:CB
 ```
 
@@ -361,7 +361,7 @@ ModuleNotFoundError: No module named 'pyparrot'
 如果需要使用其他 Python：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHON_BIN=/path/to/python ./model/run_swing_direct_flight.sh --addr E0:14:89:09:3D:CB
 ```
 

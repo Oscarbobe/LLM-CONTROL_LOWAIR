@@ -96,7 +96,7 @@ print(resp["message"]["content"])
 ### 创建独立 conda 环境
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 conda env create -f environment-llm.yml
 conda activate swing-control-llm
 ```

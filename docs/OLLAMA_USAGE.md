@@ -32,7 +32,7 @@ ollama run qwen2.5:3b "把'起飞后悬停2秒再降落'解析成JSON"
 ## 3. 在本项目中解析中文指令
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.parse_instruction \
   "起飞后悬停2秒再降落" \
   --model qwen2.5:3b \

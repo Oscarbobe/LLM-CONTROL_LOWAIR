@@ -23,7 +23,7 @@
 中文指令真机执行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
 ```
 

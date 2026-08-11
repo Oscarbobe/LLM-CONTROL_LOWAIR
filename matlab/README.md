@@ -12,7 +12,7 @@
 在项目根目录运行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src python -m swing_control.app.map_route \
   "飞到果园上方悬停两秒再降落" \
   --save-actions data/processed/instructions/map_last_actions.json
@@ -37,7 +37,7 @@ PYTHONPATH=src python -m swing_control.app.map_route \
 打开 MATLAB，在命令窗口输入：
 
 ```matlab
-cd('/home/abc/桌面/SWING_CONTROL/matlab')
+cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
 simulate_swing_actions
 ```
 
@@ -54,8 +54,8 @@ simulate_swing_actions('../data/processed/instructions/map_last_actions.json')
 
 ```
 Swing MATLAB simulation
-Action file: /home/abc/桌面/SWING_CONTROL/data/processed/instructions/map_last_actions.json
-Map file:    /home/abc/桌面/SWING_CONTROL/data/maps/site_map.json
+Action file: /home/abc/桌面/LLM-CONTROL_LOWAIR/data/processed/instructions/map_last_actions.json
+Map file:    /home/abc/桌面/LLM-CONTROL_LOWAIR/data/maps/site_map.json
 
 Action sequence:
   01. pre_flight_check: no pose change
@@ -100,7 +100,7 @@ trajectory = actionsToTimeline(actions, siteMap);
 
 ```matlab
 % result 必须是 simulate_swing_actions 的返回值
-exportSimulationResult(result, '/home/abc/桌面/SWING_CONTROL')
+exportSimulationResult(result, '/home/abc/桌面/LLM-CONTROL_LOWAIR')
 ```
 
 ## 常见问题

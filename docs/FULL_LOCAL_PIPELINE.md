@@ -21,7 +21,7 @@ qwen3.5:4b
 只做 dry-run，不连接无人机：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落"
 ```
 

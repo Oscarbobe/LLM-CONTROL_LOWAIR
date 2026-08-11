@@ -2,7 +2,7 @@ function result = simulate_swing_actions(actionFile)
 %SIMULATE_SWING_ACTIONS Simulate Swing action JSON without real hardware.
 %
 % Usage in MATLAB:
-%   cd('/home/abc/桌面/SWING_CONTROL/matlab')
+%   cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
 %   simulate_swing_actions
 %
 % Optional:

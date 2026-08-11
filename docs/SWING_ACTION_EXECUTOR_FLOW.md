@@ -54,7 +54,7 @@ switch_quadricopter -> swing.set_flying_mode("quadricopter")
 先 dry-run：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.dry_run_actions --demo --confirm
 ```
 
@@ -63,14 +63,14 @@ PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.dry_run_acti
 推荐使用一键脚本，它会先处理蓝牙，再进入完整执行流程：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_actions.sh --addr E0:14:89:09:3D:CB
 ```
 
 如果从中文指令直接进入真机操作，推荐使用：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
 ```
 

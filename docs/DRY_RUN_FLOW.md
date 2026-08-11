@@ -51,7 +51,7 @@ src/swing_control/app/dry_run_actions.py
 运行内置示例：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.dry_run_actions --demo
 ```
 

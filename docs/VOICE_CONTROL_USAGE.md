@@ -18,7 +18,7 @@
 先运行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_voice.sh --check-env
 ```
 

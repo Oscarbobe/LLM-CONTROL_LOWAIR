@@ -1,4 +1,4 @@
-# SWING_CONTROL 技术文档
+# LLM-CONTROL_LOWAIR 技术文档
 
 本文档汇总本项目在多轮交互后形成的完整技术逻辑，覆盖项目目的、运行链路、目录结构、代码文件职责、核心函数、MATLAB/Simulink 仿真、真机蓝牙恢复、Ollama 接入、动作校验、dry-run、人工确认、pyparrot 执行和日志保存方式。
 
@@ -59,7 +59,7 @@ dry-run 不连接无人机，适合验证指令解析和动作安全性。
 运行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落"
 ```
 
@@ -94,7 +94,7 @@ run_swing_instruction.sh --execute
 运行：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落" --execute
 ```
 
@@ -207,7 +207,7 @@ run_swing_direct_flight.sh
 ## 3. 项目目录结构及大类作用
 
 ```text
-SWING_CONTROL/
+LLM-CONTROL_LOWAIR/
 ├── README.md
 ├── TECHNICAL_DOCUMENTATION.md
 ├── OPENCODE_PROJECT_STATUS_GUIDE.md
@@ -1063,7 +1063,7 @@ ollama run MODEL PROMPT
 ### 8.1 中文指令 dry-run
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落"
 ```
 

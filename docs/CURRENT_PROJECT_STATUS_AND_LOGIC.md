@@ -353,7 +353,7 @@ PYTHONPATH=src /home/abc/miniconda3/bin/python -m swing_control.app.parse_instru
 示例命令：
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_actions.sh --addr E0:14:89:09:3D:CB
 ```
 

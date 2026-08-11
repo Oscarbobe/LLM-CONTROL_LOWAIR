@@ -18,7 +18,7 @@
 ### 1. 文本指令 → 动作 JSON（dry-run）
 
 ```bash
-cd /home/abc/桌面/SWING_CONTROL
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 PYTHONPATH=src python -m swing_control.app.parse_instruction "起飞后悬停2秒再降落" --dry-run
 ```
 
@@ -33,7 +33,7 @@ PYTHONPATH=src python -m swing_control.app.map_route \
 ### 3. MATLAB 仿真
 
 ```matlab
-cd('/home/abc/桌面/SWING_CONTROL/matlab')
+cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
 simulate_swing_actions('../data/processed/instructions/map_last_actions.json')
 ```
 
@@ -51,7 +51,7 @@ simulate_swing_actions('../data/processed/instructions/map_last_actions.json')
 ## 项目结构
 
 ```text
-SWING_CONTROL/
+LLM-CONTROL_LOWAIR/
 ├── README.md
 ├── Makefile
 ├── pyproject.toml
