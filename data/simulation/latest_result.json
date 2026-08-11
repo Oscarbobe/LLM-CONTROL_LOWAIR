@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "safetyErrors": [],
+  "finalPose": [
+    3,
+    2,
+    0
+  ],
+  "finalHeadingDeg": 0,
+  "airborne": false,
+  "totalTime": 18.400000000000002
+}
