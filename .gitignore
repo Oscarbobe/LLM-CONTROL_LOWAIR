@@ -13,12 +13,15 @@ __pycache__/
 data/logs/*.jsonl
 data/raw/audio/*.wav
 data/raw/audio/*.txt
+data/reports/*.md
 
 # Generated simulation outputs
 data/simulation/
 
 # Local archives and temporary exports
 *.zip
+*.tar.gz
+dist/
 三下乡项目申请.md
 
 # MATLAB temporary files

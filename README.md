@@ -15,6 +15,40 @@
 
 ## 快速开始
 
+### 0. 环境安装
+
+推荐使用 Python 3.11。项目已提供 `.python-version` 和 `environment-delivery.yml`。
+
+```bash
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
+conda env create -f environment-delivery.yml
+conda activate llm-control-lowair
+./scripts/install_ubuntu_deps.sh
+```
+
+安装后的最终验收命令：
+
+```bash
+make check-env
+make delivery-check
+```
+
+详细说明见 [Ubuntu 交付安装与最终验收](docs/DELIVERY_INSTALL_ACCEPTANCE.md)。
+
+### 0. Ubuntu 交付检查
+
+```bash
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
+make check-env
+make delivery-check
+```
+
+`make delivery-check` 会串联环境检查、自动化测试、文本 dry-run、地图规划和交付报告生成。生成报告位于：
+
+```text
+data/reports/latest_report.md
+```
+
 ### 1. 文本指令 → 动作 JSON（dry-run）
 
 ```bash
@@ -48,13 +82,42 @@ simulate_swing_actions('../data/processed/instructions/map_last_actions.json')
 ./model/run_swing_voice.sh --no-log
 ```
 
+### 5. 一键演示和发布包
+
+```bash
+./run_demo.sh
+./run_demo.sh --full
+./run_demo.sh --menu
+./run_demo.sh --streamlit
+./run_demo_menu.sh
+./scripts/package_release.sh
+```
+
+发布包输出到 `dist/`。
+
+Streamlit 功能展示面板：
+
+```bash
+make streamlit
+```
+
+打开浏览器访问 `http://127.0.0.1:8501`。
+
 ## 项目结构
 
 ```text
 LLM-CONTROL_LOWAIR/
 ├── README.md
+├── SAFETY.md
 ├── Makefile
 ├── pyproject.toml
+├── .python-version
+├── environment-delivery.yml        # Ubuntu 交付环境（Python 3.11）
+├── run_demo.sh                     # 快速演示入口
+├── run_demo_menu.sh                # 交互式 Shell 演示菜单
+├── demo_streamlit.py               # Streamlit 功能展示面板
+├── examples/                      # Ubuntu 演示命令和样例口令
+├── scripts/                       # 环境检查、依赖安装、交付验证脚本
 ├── configs/
 │   └── default.yaml
 ├── data/
@@ -63,6 +126,7 @@ LLM-CONTROL_LOWAIR/
 │   ├── processed/
 │   │   └── instructions/          # 生成的动作 JSON
 │   ├── simulation/                # MATLAB 仿真导出（CSV/JSON/PNG）
+│   ├── reports/                   # Ubuntu 交付报告（运行生成）
 │   └── logs/
 ├── matlab/
 │   ├── README.md
@@ -75,8 +139,9 @@ LLM-CONTROL_LOWAIR/
 │   └── exportSimulationResult.m   # 导出 CSV/JSON/PNG
 ├── simulink/
 │   ├── README.md
-│   ├── actionsToVelocityCmd.m      # 动作 → Simulink 速度命令
-│   └── build_swing_simulink_model.m # 生成 .slx 的构建脚本
+│   ├── actionsToVelocityCmd.m       # 动作 → Simulink 速度命令
+│   ├── build_swing_simulink_model.m # 生成 .slx 的构建脚本
+│   └── swing_language_control_sim.slx # 已生成的 Simulink 模型
 ├── model/
 │   ├── run_swing_voice.sh
 │   ├── run_swing_instruction.sh
@@ -107,13 +172,17 @@ LLM-CONTROL_LOWAIR/
 | 语音输入（麦克风 → Whisper → 控制链路） | 已实现 |
 | MATLAB 脚本仿真（轨迹绘图 + 安全结论） | 代码已具备，待 MATLAB GUI 实测 |
 | MATLAB 结果导出（CSV/JSON/PNG） | 代码已具备，待 MATLAB GUI 实测 |
-| Simulink 动态模型 | 构建脚本已具备，待生成 `.slx` 并实测 |
+| Simulink 动态模型 | `.slx` 已生成，待 Windows MATLAB/Simulink 实测运行 |
 | 真机执行（pyparrot + 蓝牙） | 已实现，可选验证 |
+| Ubuntu 交付检查和报告生成 | 已实现 |
 
 ## 文档入口
 
 - [MATLAB 仿真指南](matlab/README.md)
+- [Windows MATLAB/Simulink 操作手册](MATLAB_SIMULINK_OPERATION_MANUAL.md)
 - [技术文档](TECHNICAL_DOCUMENTATION.md)
+- [安全交付说明](SAFETY.md)
+- [Ubuntu 交付安装与最终验收](docs/DELIVERY_INSTALL_ACCEPTANCE.md)
 - [项目状态与后续计划](OPENCODE_PROJECT_STATUS_GUIDE.md)
 - [运行环境说明](docs/ENVIRONMENT.md)
 - [Ollama 安装说明](docs/LLM_INSTALL.md)
@@ -127,10 +196,24 @@ python -m pip install pytest PyYAML pandas scipy
 PYTHONPATH=src pytest
 ```
 
+当前验证状态：
+
+```text
+PYTHONPATH=src python -m pytest -q
+72 passed
+```
+
 或使用 Makefile：
 
 ```bash
 make test
 make map-demo
 make text-demo
+make check-env
+make report
+make delivery-check
+make demo
+make menu
+make streamlit
+make package
 ```

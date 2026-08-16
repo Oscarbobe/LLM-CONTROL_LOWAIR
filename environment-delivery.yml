@@ -1,0 +1,25 @@
+name: llm-control-lowair
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas
+  - scipy
+  - pyyaml
+  - networkx
+  - pip:
+      - bluepy
+      - untangle
+      - zeroconf
+      - opencv-python
+      - pydantic
+      - rich
+      - streamlit
+      - ollama
+      - openai-whisper
+      - tiktoken
+      - numba
+      - pytest

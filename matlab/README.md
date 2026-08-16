@@ -1,118 +1,97 @@
-# MATLAB 仿真运行指南
+# MATLAB 脚本仿真指南
 
-## 前置条件
+本目录保存 MATLAB 脚本仿真文件。Windows 上的完整操作步骤以根目录文档为准：
 
-- MATLAB R2019b 或更高版本（需要 `jsondecode` / `jsonencode` / `writematrix`）
-- 已通过 Python 生成动作 JSON 文件
-
-## 快速开始
-
-### 1. 生成动作 JSON（Python 端）
-
-在项目根目录运行：
-
-```bash
-cd /home/abc/桌面/LLM-CONTROL_LOWAIR
-PYTHONPATH=src python -m swing_control.app.map_route \
-  "飞到果园上方悬停两秒再降落" \
-  --save-actions data/processed/instructions/map_last_actions.json
+```text
+MATLAB_SIMULINK_OPERATION_MANUAL.md
 ```
 
-其他常用指令：
+## 文件说明
 
-```bash
-# 巡视玉米地
-PYTHONPATH=src python -m swing_control.app.map_route \
-  "巡视玉米地" \
-  --save-actions data/processed/instructions/map_last_actions.json
-
-# 飞到水渠旁边
-PYTHONPATH=src python -m swing_control.app.map_route \
-  "飞到水渠旁边悬停一秒再降落" \
-  --save-actions data/processed/instructions/map_last_actions.json
+```text
+simulate_swing_actions.m     主入口，读取动作 JSON 和地图 JSON
+applySwingAction.m           将动作转换为位姿变化
+checkMapSafety.m             检查边界和禁飞区
+plotSwingSimulation.m        绘制三维轨迹图
+actionsToTimeline.m          动作序列转时间序列
+applyWindDisturbance.m       风扰动模拟
+exportSimulationResult.m     导出 CSV、JSON、PNG
 ```
 
-### 2. 在 MATLAB 中运行仿真
+## Windows 推荐运行方式
 
-打开 MATLAB，在命令窗口输入：
+先在 PowerShell 中生成动作 JSON：
+
+```powershell
+$projectRoot = 'C:\Users\Lenovo\Desktop\新建文件夹\飞行控制\LOW-AIR\LLM-CONTROL_LOWAIR'
+Set-Location -LiteralPath $projectRoot
+$env:PYTHONPATH = (Join-Path $projectRoot 'src')
+python -m swing_control.app.map_route `
+  '飞到果园上方悬停两秒再降落' `
+  --save-actions '.\data\processed\instructions\map_last_actions.json'
+```
+
+然后在 MATLAB 中运行：
 
 ```matlab
-cd('/home/abc/桌面/LLM-CONTROL_LOWAIR/matlab')
-simulate_swing_actions
-```
-
-默认读取 `data/processed/instructions/interactive_last_actions.json`。
-如需指定文件：
-
-```matlab
-simulate_swing_actions('../data/processed/instructions/map_last_actions.json')
+projectRoot = 'C:\Users\Lenovo\Desktop\新建文件夹\飞行控制\LOW-AIR\LLM-CONTROL_LOWAIR';
+cd(projectRoot);
+addpath(fullfile(projectRoot, 'matlab'));
+result = simulate_swing_actions(fullfile('data', 'processed', 'instructions', 'map_last_actions.json'));
 ```
 
 ## 预期输出
 
-### 命令行输出
+MATLAB 命令窗口应输出：
 
-```
-Swing MATLAB simulation
-Action file: /home/abc/桌面/LLM-CONTROL_LOWAIR/data/processed/instructions/map_last_actions.json
-Map file:    /home/abc/桌面/LLM-CONTROL_LOWAIR/data/maps/site_map.json
-
-Action sequence:
-  01. pre_flight_check: no pose change
-  02. takeoff 5.00s to z=1.50m
-  03. fly_forward 3.00s, distance 3.00m
-  ...
-  Simulation result: PASS. No boundary or no-fly-zone violation detected.
-
-Simulation results exported to data/simulation/:
-  .../data/simulation/latest_trajectory.csv
-  .../data/simulation/latest_result.json
-  .../data/simulation/latest_figure.png
+```text
+Action sequence
+Final pose
+Total simulated time
+Simulation result: PASS 或 FAIL
 ```
 
-### 图形窗口
+图形窗口应显示：
 
-- **蓝色轨迹线**：无人机飞行路径
-- **黑色圆点**：起飞点 (origin)
-- **绿色五角星 + 圆**：目标区域（果园、玉米地、水渠等）
-- **红色虚线圆 + 阴影**：禁飞区（房屋、电线杆）
-
-### 导出文件
-
-| 文件 | 内容 |
-|------|------|
-| `data/simulation/latest_trajectory.csv` | 时间序列：time, x, y, z, heading |
-| `data/simulation/latest_result.json` | 仿真结论：ok, safetyErrors, finalPose, totalTime |
-| `data/simulation/latest_figure.png` | 三维轨迹图截图 |
-
-## 单独使用工具函数
-
-### actionsToTimeline — 动作 JSON 转时间序列
-
-```matlab
-actions = jsondecode(fileread('../data/processed/instructions/map_last_actions.json'));
-siteMap = jsondecode(fileread('../data/maps/site_map.json'));
-trajectory = actionsToTimeline(actions, siteMap);
-% trajectory = [t, x, y, z, headingDeg] 矩阵，采样间隔 0.1s
+```text
+蓝色轨迹线
+起飞点
+目标区域
+禁飞区
 ```
 
-### exportSimulationResult — 手动导出
+运行成功后应生成：
 
-```matlab
-% result 必须是 simulate_swing_actions 的返回值
-exportSimulationResult(result, '/home/abc/桌面/LLM-CONTROL_LOWAIR')
+```text
+data/simulation/latest_trajectory.csv
+data/simulation/latest_result.json
+data/simulation/latest_figure.png
+```
+
+## 当前状态
+
+```text
+MATLAB 仿真代码已具备
+导出代码已具备
+仍需在 Windows MATLAB GUI 中实测运行并确认 data/simulation 输出
 ```
 
 ## 常见问题
 
-**Q: 提示 "Action file not found"**
-→ 先运行 Python 端的 `map_route --save-actions` 命令生成动作 JSON。
+如果提示找不到函数：
 
-**Q: 轨迹图不显示**
-→ 确保 MATLAB 工作目录为 `matlab/`，且 `applySwingAction.m`、`checkMapSafety.m`、`plotSwingSimulation.m` 在同一目录下。
+```matlab
+addpath(fullfile(projectRoot, 'matlab'));
+```
 
-**Q: 仿真结果为 FAIL**
-→ 检查命令行输出的具体原因（未降落、越界、进入禁飞区），调整指令或地图参数。
+如果提示找不到动作 JSON：
 
-**Q: 没有 MATLAB GUI（纯命令行）**
-→ 可以安装 GNU Octave，但部分函数（`jsonencode`、`writematrix`）需要适配。推荐使用 MATLAB 图形界面。
+```text
+先运行 PowerShell 中的 map_route --save-actions 命令。
+```
+
+如果仿真结果为 FAIL：
+
+```text
+查看 result.safetyErrors，检查路线是否越界或进入禁飞区。
+```

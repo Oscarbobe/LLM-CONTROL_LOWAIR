@@ -1,35 +1,46 @@
 # 环境检查结果
 
-检查时间：2026-08-03
+更新时间：2026-08-12
 
-## 1. 系统命令
+## 1. Python 与测试
 
-已安装：
-
-- `bluetoothctl`
-- `hciconfig`
-- `rfkill`
-- `lsusb`
-- `systemctl`
-- `modprobe`
-- `timeout`
-- `ffmpeg`
-- `arecord`
-- `parec`
-- `pactl`
-- `ollama`
-- `whisper`
-
-## 2. 蓝牙状态
-
-当前蓝牙控制器已可用：
+当前 Python 环境已具备项目测试所需依赖：
 
 ```text
-Controller 48:45:E6:6D:8B:70
-Powered: yes
+pytest 9.1.1
+PyYAML 6.0.3
+ollama Python 包
+socksio 1.0.0
+pandas 3.0.5
+scipy 1.18.0
+numpy 2.4.6
+networkx 3.6.1
+openai-whisper 20250625
+torch 2.13.0+cu130
+bluepy
 ```
 
-## 3. Ollama 与模型
+当前测试结果：
+
+```bash
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
+PYTHONPATH=src python -m pytest -q
+```
+
+结果：
+
+```text
+72 passed
+
+新增 Ubuntu 交付检查入口：
+
+```bash
+make check-env
+make delivery-check
+```
+```
+
+## 2. Ollama 与模型
 
 已安装：
 
@@ -38,74 +49,70 @@ ollama 0.32.5
 qwen3.5:4b
 ```
 
-## 4. 麦克风与 ASR
+验证：
 
-已检测到麦克风：
-
-```text
-card 1: PCH [HDA Intel PCH], device 0: ALC257 Analog
+```bash
+ollama list
+python -c "import ollama; print('ollama import ok')"
 ```
 
-已安装：
+## 3. 语音环境
+
+已检测通过：
 
 ```text
-openai-whisper 20250625
-torch 2.13.0+cu130
+arecord
+ffmpeg
+whisper 命令
+Python whisper
 torch cuda=True
+麦克风设备 ALC257 Analog
 ```
 
-语音控制环境自检命令：
+检查命令：
 
 ```bash
 cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_voice.sh --check-env
 ```
 
-## 5. base Python 环境
+## 4. MATLAB/Simulink
 
-Python：
+Linux shell 中未检测 `matlab`/`octave` 命令。当前 MATLAB/Simulink 操作转到 Windows 系统进行。
 
-```text
-/home/abc/miniconda3/bin/python
-```
-
-已安装：
-
-- `pyparrot`
-- `bluepy`
-- `untangle`
-- `zeroconf`
-- `cv2`
-- `numpy`
-- `torch`
-- `openai-whisper`
-- `networkx`
-- `pydantic`
-- `rich`
-
-仍缺少的扩展依赖：
-
-- `PyYAML`
-- `ollama` Python 包
-- `transformers`
-- `SpeechRecognition`
-- `jieba`
-- `pandas`
-- `scipy`
-
-说明：
-
-- 当前项目调用 Ollama 使用 HTTP/CLI，不强依赖 Python `ollama` 包。
-- 当前语音控制使用 `openai-whisper`，不强依赖 `SpeechRecognition`。
-- `PyYAML`、`transformers`、`jieba`、`pandas`、`scipy` 主要用于后续配置解析、模型扩展、中文分词、数据处理和路径规划扩展。
-
-## 6. 当前可运行能力
+Windows 操作手册：
 
 ```text
-中文文本交互 dry-run: 可运行
-中文文本交互真机执行: 可运行，需 Swing 开机并确认执行
-麦克风语音控制 dry-run: 环境已具备
-麦克风语音控制真机执行: 环境已具备，需真机安全区域
-蓝牙恢复: 已接入
-pyparrot 真机飞行: 已接入
+MATLAB_SIMULINK_OPERATION_MANUAL.md
 ```
+
+当前仓库已包含：
+
+```text
+matlab/*.m
+simulink/actionsToVelocityCmd.m
+simulink/build_swing_simulink_model.m
+simulink/swing_language_control_sim.slx
+```
+
+仍需在 Windows MATLAB/Simulink GUI 中确认：
+
+```text
+data/simulation/latest_trajectory.csv
+data/simulation/latest_result.json
+data/simulation/latest_figure.png
+Scope/XY Graph/safeFlag 正常显示
+```
+
+## 5. 真机环境
+
+Linux 真机飞行前仍需确认：
+
+```text
+Bluetooth controller 可用
+Swing 已开机且电量充足
+操作区域安全
+执行前人工输入“确认执行”
+```
+
+真机链路是可选验证，不影响 MATLAB/Simulink 仿真主线。

@@ -1,0 +1,28 @@
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
+
+# 1. 检查 Ubuntu 环境
+make check-env
+
+# 2. 运行自动化测试
+make test
+
+# 3. 文本指令 dry-run
+make text-demo
+
+# 4. 地图规划并保存动作 JSON
+make map-demo
+
+# 5. 生成交付报告
+make report
+
+# 6. 打开交互式演示菜单
+make menu
+
+# 7. 启动 Streamlit 功能展示面板
+make streamlit
+
+# 8. 检查语音控制环境
+make voice-check
+
+# 9. 进入语音控制 dry-run
+./model/run_swing_voice.sh --no-log

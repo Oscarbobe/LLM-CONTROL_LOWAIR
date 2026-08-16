@@ -8,6 +8,17 @@ LLM-CONTROL_LOWAIR/
 
 项目总目录，保存申报书、运行说明、依赖文件、产品代码、数据和测试文件。
 
+新增交付入口：
+
+- `Makefile`：统一运行测试、环境检查、地图 demo、报告生成。
+- `SAFETY.md`：真机和交付安全说明。
+- `.python-version`、`environment-delivery.yml`：Python 3.11 交付环境建议。
+- `run_demo.sh`：一键演示入口。
+- `run_demo_menu.sh`：交互式 Shell 演示菜单。
+- `demo_streamlit.py`：浏览器功能展示面板。
+- `scripts/`：Ubuntu 环境检查、依赖安装和交付验证脚本。
+- `examples/`：演示命令和语音样例口令。
+
 ## `model/`
 
 当前已经可以运行的 Parrot Swing 控制脚本目录。
@@ -67,6 +78,7 @@ data/
 ├── processed/
 │   └── instructions/
 ├── maps/
+├── reports/
 └── logs/
 ```
 
@@ -76,6 +88,7 @@ data/
 - `raw/text/`：原始文本指令
 - `processed/instructions/`：结构化指令数据
 - `maps/`：地图、地块、障碍物、禁飞区数据
+- `reports/`：Ubuntu 交付报告输出目录
 - `logs/`：飞行测试和系统运行日志
 
 ## `src/swing_control/`
@@ -114,10 +127,10 @@ src/swing_control/
 - 路径规划测试
 - 安全规则测试
 - 飞控接口模拟测试
+- 交付报告生成测试
 
 ## `assets/`
 
 素材目录。
 
 用于保存答辩图、流程图、系统架构图、演示图片等。
-

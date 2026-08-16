@@ -25,17 +25,27 @@
 - 参照 `/home/abc/桌面/LowAir-GS/pyparrot` 的 MT7925 蓝牙恢复逻辑，加入本项目自动化脚本。
 - **MATLAB 脚本仿真代码**：三维轨迹绘制、地图安全检查、PASS/FAIL 结论。
 - **MATLAB 结果导出代码**：轨迹 CSV、结果 JSON、仿真 PNG 自动导出到 `data/simulation/`。
-- **Simulink 构建脚本**：提供动作速度命令转换和 `.slx` 模型构建脚本，用于后续动态仿真展示。
+- **Simulink 动态模型**：提供动作速度命令转换、模型构建脚本，且 `simulink/swing_language_control_sim.slx` 已生成。
 - A*/网格路径规划、轨迹平滑与风扰动模型的初步代码结构。
+- 自动化测试已就绪，当前 `PYTHONPATH=src python -m pytest -q` 验证结果为 `72 passed`。
+- Ubuntu 交付检查脚本：`scripts/check_ubuntu_env.sh`。
+- Ubuntu 交付验证脚本：`scripts/verify_delivery.sh`，串联环境检查、测试、dry-run、地图规划和报告生成。
+- 交付报告生成器：`swing_control.app.generate_report`，输出 `data/reports/latest_report.md`。
+- 安全交付文档：`SAFETY.md`。
+- 交付环境固定：`.python-version` 和 `environment-delivery.yml` 推荐 Python 3.11。
+- 一键演示入口：`run_demo.sh`。
+- 交互式 Shell 演示菜单：`run_demo_menu.sh`。
+- Streamlit 功能展示面板：`demo_streamlit.py`，入口为 `make streamlit`。
+- 发布包脚本：`scripts/package_release.sh`。
 
 当前未完整实现但保留结构的能力：
 
 - 真实 GPS/GIS 地图。
 - 定位闭环下的真实避障、返航路径和实际飞行误差校正。
 - 多无人机调度或高级任务规划。
-- Simulink 动态仿真模型的实际 `.slx` 文件生成与 GUI 实测。
+- Simulink 动态仿真模型的 Windows MATLAB/Simulink GUI 实测。
 - MATLAB 仿真在 MATLAB GUI 中的实际运行验证（当前 shell 未检测到 `matlab`/`octave` 命令）。
-- 自动化测试运行环境仍缺少 `pytest`、`PyYAML`、`pandas`、`scipy` 等依赖。
+- 真实 MATLAB 仿真结果导出文件需在 Windows MATLAB 中运行后生成。
 
 ## 2. 项目运行总逻辑
 
@@ -61,6 +71,39 @@ dry-run 不连接无人机，适合验证指令解析和动作安全性。
 ```bash
 cd /home/abc/桌面/LLM-CONTROL_LOWAIR
 ./model/run_swing_instruction.sh "起飞后悬停2秒再降落"
+```
+
+### 2.0 Ubuntu 交付验证链路
+
+Ubuntu 侧不依赖 MATLAB GUI，可以完成文本/语音入口环境检查、地图规划、动作安全校验、dry-run 预览、自动化测试和 Markdown 交付报告生成。
+
+```text
+make delivery-check
+  -> check_ubuntu_env.py 检查 Python/依赖/Ollama/Whisper/蓝牙可选项
+  -> pytest 执行自动化测试
+  -> parse_instruction.py 执行文本 dry-run
+  -> map_route.py 生成地图规划动作
+  -> generate_report.py 汇总动作、地图、校验和仿真结果
+```
+
+运行：
+
+```bash
+cd /home/abc/桌面/LLM-CONTROL_LOWAIR
+make check-env
+make delivery-check
+```
+
+报告输出：
+
+```text
+data/reports/latest_report.md
+```
+
+交付安装、验收和发布包说明见：
+
+```text
+docs/DELIVERY_INSTALL_ACCEPTANCE.md
 ```
 
 关闭日志：
@@ -278,8 +321,9 @@ Simulink 动态仿真目录。
 - `simulink/README.md`：Simulink 模型搭建和运行说明。
 - `simulink/actionsToVelocityCmd.m`：动作 JSON 转 Simulink 速度命令。
 - `simulink/build_swing_simulink_model.m`：生成 `swing_language_control_sim.slx` 的构建脚本。
+- `simulink/swing_language_control_sim.slx`：已生成的 Simulink 动态仿真模型。
 
-当前状态：构建脚本已存在，仍需在 MATLAB/Simulink GUI 中运行并生成 `.slx` 文件。
+当前状态：`.slx` 文件已存在，仍需在 Windows MATLAB/Simulink GUI 中打开并实测运行。
 
 ### 3.6 `docs/`
 
@@ -318,11 +362,12 @@ Python 源码目录，按功能拆分为 app、nlp、safety、planning、flight 
 测试目录，已包含核心单元测试：
 
 - `tests/test_action_validator.py`
+- `tests/test_generate_report.py`
 - `tests/test_instruction_parser.py`
 - `tests/test_path_planner.py`
 - `tests/test_route_planner.py`
 
-当前 shell 环境缺少 `pytest`，需要安装依赖后运行：
+当前测试依赖已安装，最近验证结果为 `72 passed`。复测命令：
 
 ```bash
 python -m pip install pytest PyYAML pandas scipy
@@ -1203,6 +1248,9 @@ python -m pip install jieba pydantic rich SpeechRecognition transformers acceler
 - 动作校验。
 - 动作预览。
 - 日志保存。
+- `map_route --save-actions` 保存 MATLAB/Simulink 输入动作 JSON。
+- 单元测试已覆盖动作校验、指令解析、A*/路径规划、地图路线规划和交付报告生成，当前结果为 `72 passed`。
+- Simulink 模型文件 `simulink/swing_language_control_sim.slx` 已存在。
 - 真机执行代码链路。
 - 蓝牙恢复脚本接入。
 
@@ -1215,7 +1263,9 @@ python -m pip install jieba pydantic rich SpeechRecognition transformers acceler
 
 后续建议补齐：
 
+- Windows MATLAB 中运行 `simulate_swing_actions` 并确认 `data/simulation/` 生成 CSV、JSON、PNG。
+- Windows Simulink 中打开并运行 `swing_language_control_sim.slx`。
 - 真实 GIS/GeoJSON/DEM 地图数据。
 - 定位闭环、复杂避障、返航路径。
-- 测试：为 `action_validator`、`instruction_parser`、`SwingActionExecutor` 增加单元测试。
+- 可选增加 `SwingActionExecutor` fake/mock 测试，避免依赖真机。
 - 模型提示词优化：减少 qwen3.5 输出 `{"error":"无法理解"}` 的概率。

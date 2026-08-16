@@ -15,6 +15,7 @@ networkx
 pandas
 scipy
 rich
+streamlit
 
 # LLM / NLP dependencies (swing-control-llm conda env).
 ollama

@@ -206,7 +206,7 @@ result.trajectory
 
 ## 4. Simulink 动态仿真
 
-先确认第 3 节能够运行，再执行本节。仓库保存的是模型构建脚本；`swing_language_control_sim.slx` 需要首次运行时生成。
+先确认第 3 节能够运行，再执行本节。仓库当前已经包含 `simulink\swing_language_control_sim.slx`；`build_swing_simulink_model.m` 用于在模型缺失、损坏或需要重新生成时重建 `.slx`。
 
 ### 4.1 加入脚本路径并生成输入变量
 
@@ -230,7 +230,16 @@ whos velCmd siteMap simDuration
 
 必须先创建这三个变量，因为构建出的模型会引用它们。
 
-### 4.2 构建模型
+### 4.2 打开或重建模型
+
+优先打开仓库中已有模型：
+
+```matlab
+modelName = 'swing_language_control_sim';
+open_system(fullfile(projectRoot, 'simulink', 'swing_language_control_sim.slx'));
+```
+
+如果模型文件不存在，或需要根据脚本重新生成模型，再运行：
 
 ```matlab
 cd(fullfile(projectRoot, 'simulink'));
@@ -249,7 +258,6 @@ simulink\swing_language_control_sim.slx
 
 ```matlab
 modelName = 'swing_language_control_sim';
-open_system(modelName);
 simOut = sim(modelName);
 ```
 
@@ -289,7 +297,7 @@ close_system(modelName, 0);
 5. 确认命令窗口结论、三维轨迹图以及 `data\simulation` 下的三个导出文件。
 6. 把 `simulink` 目录加入 MATLAB 路径。
 7. 先运行 `actionsToVelocityCmd(actionFile)`，确认工作区变量齐全。
-8. 进入 `simulink` 目录并运行 `build_swing_simulink_model`。
+8. 打开已有 `swing_language_control_sim.slx`；如果缺失或需要重建，再运行 `build_swing_simulink_model`。
 9. 打开并运行模型，查看 Scope、XY Graph 与 `safeFlag`。
 
 ## 6. 验收标准
@@ -304,7 +312,7 @@ close_system(modelName, 0);
 
 ### Simulink 动态仿真
 
-- 能生成 `simulink\swing_language_control_sim.slx`
+- `simulink\swing_language_control_sim.slx` 已存在，必要时可重建
 - 工作区存在 `velCmd`、`siteMap`、`simDuration`
 - 模型能正常更新并运行
 - Scope 和 XY Graph 中有轨迹
