@@ -13,7 +13,6 @@ __pycache__/
 data/logs/*.jsonl
 data/raw/audio/*.wav
 data/raw/audio/*.txt
-data/reports/*.md
 
 # Generated simulation outputs
 data/simulation/
